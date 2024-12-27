@@ -1,0 +1,85 @@
+@model Course
+
+@{
+    ViewData["Title"] = $"{Model.Title} - Öğrenciler";
+}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-1">Kayıtlı Öğrenciler</h1>
+                <div class="text-muted">
+                    <i class="fas fa-book"></i> @Model.Title
+                </div>
+            </div>
+            <a asp-action="EditCourse" asp-route-id="@Model.CourseId" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Kursa Dön
+            </a>
+        </div>
+
+        @if (!Model.EnrolledStudents.Any())
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h4>Henüz Kayıtlı Öğrenci Yok</h4>
+                <p class="text-muted">Bu kursa henüz hiçbir öğrenci kayıt olmamış.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px">#</th>
+                            <th>Ad Soyad</th>
+                            <th>E-posta</th>
+                            <th>Kayıt Tarihi</th>
+                            <th style="width: 100px">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var student in Model.EnrolledStudents.OrderBy(s => s.FullName))
+                        {
+                            <tr>
+                                <td>
+                                    @if (string.IsNullOrEmpty(student.ProfileImagePath))
+                                    {
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                                             style="width: 35px; height: 35px;">
+                                            @student.FirstName[0]@student.LastName[0]
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <img src="@student.ProfileImagePath" class="rounded-circle"
+                                             alt="@student.FullName" style="width: 35px; height: 35px; object-fit: cover;">
+                                    }
+                                </td>
+                                <td>@student.FullName</td>
+                                <td>@student.Email</td>
+                                <td>@student.RegisterDate.ToShortDateString()</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                            onclick="sendMessage('@student.Id')">
+                                        <i class="fas fa-envelope"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function sendMessage(studentId) {
+            // Mesaj gönderme fonksiyonu (ileride eklenecek)
+            alert('Mesaj gönderme özelliği yakında eklenecek!');
+        }
+    </script>
+} 

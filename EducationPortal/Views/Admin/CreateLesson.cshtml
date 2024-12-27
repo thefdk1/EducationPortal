@@ -1,0 +1,59 @@
+@model EducationPortal.ViewModels.LessonViewModel
+@{
+    ViewData["Title"] = "Yeni Ders Oluştur";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">@ViewBag.CourseTitle - Yeni Ders</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/Admin">Yönetici Paneli</a></li>
+        <li class="breadcrumb-item"><a href="/Admin/Courses">Kurslar</a></li>
+        <li class="breadcrumb-item"><a href="/Admin/Lessons/@ViewBag.CourseId">Dersler</a></li>
+        <li class="breadcrumb-item active">Yeni Ders</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-edit me-1"></i>
+            Ders Bilgileri
+        </div>
+        <div class="card-body">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <form action="/Admin/CreateLesson" method="post">
+                <input type="hidden" name="courseId" value="@ViewBag.CourseId" />
+                
+                <div class="mb-3">
+                    <label for="title" class="form-label">Ders Başlığı</label>
+                    <input type="text" class="form-control" id="title" name="title" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Açıklama</label>
+                    <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="videoUrl" class="form-label">Video URL</label>
+                    <input type="url" class="form-control" id="videoUrl" name="videoUrl" required>
+                    <small class="form-text text-muted">YouTube veya Vimeo video bağlantısını girin.</small>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Dersi Oluştur
+                    </button>
+                    <a href="/Admin/Lessons/@ViewBag.CourseId" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-1"></i> İptal
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> 

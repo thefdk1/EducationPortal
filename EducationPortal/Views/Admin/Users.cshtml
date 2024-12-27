@@ -1,0 +1,168 @@
+@using EducationPortal.Models
+@model List<UserAccount>
+@{
+    ViewData["Title"] = "Kullanıcı Yönetimi";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Kullanıcı Yönetimi</h1>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="usersTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Ad Soyad</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr id="user-@user.Id">
+                                <td>@user.FullName</td>
+                                <td>@user.Email</td>
+                                <td>@(user.Roles.FirstOrDefault() ?? "Rol Atanmamış")</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="@Url.Action("EditUser", new { id = user.Id })" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button class="btn btn-danger btn-sm delete-user" data-user-id="@user.Id" data-user-name="@user.FullName">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // DataTable başlat
+            var table = $('#usersTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Turkish.json"
+                }
+            });
+
+            // Silme işlemi için click event handler
+            $('.delete-user').click(function () {
+                var userId = $(this).data('user-id');
+                var userName = $(this).data('user-name');
+                var row = $(this).closest('tr');
+                
+                if (confirm(userName + ' kullanıcısını silmek istediğinizden emin misiniz?')) {
+                    $.ajax({
+                        url: '/Admin/DeleteUser',
+                        type: 'POST',
+                        data: { id: userId },
+                        success: function (result) {
+                            if (result.success) {
+                                // Tablodan satırı kaldır
+                                table.row(row).remove().draw();
+                                
+                                // Başarılı bildirimi göster
+                                var notification = `
+                                    <div class="custom-toast" role="alert" aria-live="assertive" aria-atomic="true">
+                                        <div class="toast-header">
+                                            <i class="fas fa-check-circle me-2"></i>
+                                            <strong class="me-auto">Başarılı</strong>
+                                            <small class="text-white-50">şimdi</small>
+                                            <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="toast" aria-label="Close"></button>
+                                        </div>
+                                        <div class="toast-body">
+                                            Kullanıcı başarıyla silindi.
+                                        </div>
+                                    </div>`;
+                                
+                                var $notification = $(notification);
+                                $("#notification-container").append($notification);
+                                
+                                setTimeout(function() {
+                                    $notification.addClass('show');
+                                }, 100);
+                                
+                                setTimeout(function() {
+                                    $notification.removeClass('show');
+                                    setTimeout(function() {
+                                        $notification.remove();
+                                    }, 300);
+                                }, 5000);
+                            } else {
+                                // Hata bildirimi göster
+                                var notification = `
+                                    <div class="custom-toast" role="alert" aria-live="assertive" aria-atomic="true">
+                                        <div class="toast-header bg-danger">
+                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                            <strong class="me-auto">Hata</strong>
+                                            <small class="text-white-50">şimdi</small>
+                                            <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="toast" aria-label="Close"></button>
+                                        </div>
+                                        <div class="toast-body">
+                                            ${result.message}
+                                        </div>
+                                    </div>`;
+                                
+                                var $notification = $(notification);
+                                $("#notification-container").append($notification);
+                                
+                                setTimeout(function() {
+                                    $notification.addClass('show');
+                                }, 100);
+                                
+                                setTimeout(function() {
+                                    $notification.removeClass('show');
+                                    setTimeout(function() {
+                                        $notification.remove();
+                                    }, 300);
+                                }, 5000);
+                            }
+                        },
+                        error: function () {
+                            // Hata bildirimi göster
+                            var notification = `
+                                <div class="custom-toast" role="alert" aria-live="assertive" aria-atomic="true">
+                                    <div class="toast-header bg-danger">
+                                        <i class="fas fa-exclamation-circle me-2"></i>
+                                        <strong class="me-auto">Hata</strong>
+                                        <small class="text-white-50">şimdi</small>
+                                        <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="toast" aria-label="Close"></button>
+                                    </div>
+                                    <div class="toast-body">
+                                        Kullanıcı silinirken bir hata oluştu.
+                                    </div>
+                                </div>`;
+                            
+                            var $notification = $(notification);
+                            $("#notification-container").append($notification);
+                            
+                            setTimeout(function() {
+                                $notification.addClass('show');
+                            }, 100);
+                            
+                            setTimeout(function() {
+                                $notification.removeClass('show');
+                                setTimeout(function() {
+                                    $notification.remove();
+                                }, 300);
+                            }, 5000);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+} 

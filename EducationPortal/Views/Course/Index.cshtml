@@ -1,0 +1,32 @@
+﻿@model List<EducationPortal.ViewModels.CourseViewModel>
+
+@{
+    ViewData["Title"] = "Eğitimler";
+}
+
+<div class="container py-4">
+    <h1 class="mb-4">Eğitimler</h1>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var course in Model)
+        {
+            <div class="col">
+                <div class="card h-100">
+                    <img src="@course.ThumbnailImagePath" class="card-img-top" alt="@course.Title">
+                    <div class="card-body">
+                        <h5 class="card-title">@course.Title</h5>
+                        <p class="card-text">@(course.Description?.Length > 100 ? course.Description.Substring(0, 100) + "..." : course.Description)</p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">@course.Teacher.FullName</small>
+                            <a href="@Url.Action("Details", "Course", new { id = course.CourseId })" class="btn btn-primary btn-sm">
+                                <i class="fas fa-info-circle"></i> Detaylar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

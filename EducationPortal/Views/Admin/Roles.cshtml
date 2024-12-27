@@ -1,0 +1,72 @@
+@model List<UserRole>
+
+@{
+    ViewData["Title"] = "Rol Yönetimi";
+}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">Roller</h1>
+            <a asp-action="CreateRole" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Yeni Rol Oluştur
+            </a>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-user-tag fa-3x text-muted mb-3"></i>
+                <h4>Henüz Rol Oluşturulmamış</h4>
+                <p class="text-muted">İlk rolü oluşturmak için "Yeni Rol Oluştur" butonuna tıklayın.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Rol Adı</th>
+                            <th>Açıklama</th>
+                            <th style="width: 100px">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var role in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-user-tag text-primary me-2"></i>
+                                        @role.Name
+                                    </div>
+                                </td>
+                                <td>@role.Description</td>
+                                <td>
+                                    @if (!new[] { "Admin", "Teacher", "Student" }.Contains(role.Name))
+                                    {
+                                        <form asp-action="DeleteRole" method="post" class="d-inline"
+                                              onsubmit="return confirm('Bu rolü silmek istediğinize emin misiniz?');">
+                                            <input type="hidden" name="id" value="@role.Id">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mt-3">
+        @TempData["Error"]
+    </div>
+} 

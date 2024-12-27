@@ -1,0 +1,16 @@
+﻿@{
+    Layout = "_LayoutAdmin";
+}
+@section CardHeader {
+    <span>Kursu Sil</span>
+}
+@model EducationPortal.ViewModels.CourseViewModel
+<h2>Kursu Sil</h2>
+<hr />
+<h4>@Model.Title adlı kurs silinecektir, Onaylıyor musunuz?</h4>
+
+<form method="post" asp-action="Delete">
+    <input type="hidden" asp-for="CourseId" />
+    <input type="submit" value="Sil" class="btn btn-danger btn-sm" />
+    <a asp-action="Index" class="btn btn-primary btn-sm">Vazgeç</a>
+</form>

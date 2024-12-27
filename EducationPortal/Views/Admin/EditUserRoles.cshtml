@@ -1,0 +1,60 @@
+@model List<EducationPortal.ViewModels.UserRoleViewModel>
+@{
+    ViewData["Title"] = "Kullanıcı Rolleri";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Kullanıcı Rolleri</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/Admin">Yönetici Paneli</a></li>
+        <li class="breadcrumb-item"><a href="@Url.Action("Users")">Kullanıcılar</a></li>
+        <li class="breadcrumb-item active">Rol Düzenle</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-user-tag me-1"></i>
+            @ViewBag.UserName için Rol Seçimi
+        </div>
+        <div class="card-body">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <form method="post">
+                <input type="hidden" name="userId" value="@ViewBag.UserId" />
+                
+                <div class="list-group mb-4">
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        <div class="list-group-item">
+                            <div class="form-check">
+                                <input type="hidden" asp-for="@Model[i].RoleId" />
+                                <input type="hidden" asp-for="@Model[i].RoleName" />
+                                <input class="form-check-input" type="radio" name="selectedRole" 
+                                       value="@Model[i].RoleName" id="role_@Model[i].RoleName" 
+                                       @(Model[i].IsSelected ? "checked" : "") />
+                                <label class="form-check-label" for="role_@Model[i].RoleName">
+                                    @Model[i].RoleName
+                                </label>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Değişiklikleri Kaydet
+                    </button>
+                    <a asp-action="Users" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> İptal
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> 

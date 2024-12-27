@@ -1,0 +1,119 @@
+@model EducationPortal.ViewModels.CourseViewModel
+
+@{
+    ViewData["Title"] = "Yeni Kurs Ekle";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="h3 mb-4">Yeni Kurs Ekle</h1>
+
+                    <div id="alertContainer"></div>
+
+                    <form id="createCourseForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label"></label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="TeacherId" class="form-label"></label>
+                            <select asp-for="TeacherId" class="form-select" asp-items="@ViewBag.Teachers">
+                                <option value="">Öğretmen Seçin</option>
+                            </select>
+                            <span asp-validation-for="TeacherId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ThumbnailImagePath" class="form-label"></label>
+                            <input type="file" name="thumbnailImage" class="form-control" accept="image/*" />
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="submitButton">
+                                <i class="fas fa-plus-circle me-1"></i> Kurs Oluştur
+                            </button>
+                            <a asp-action="Courses" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Geri Dön
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#createCourseForm').on('submit', function (e) {
+                e.preventDefault();
+                
+                // Submit butonunu devre dışı bırak
+                $('#submitButton').prop('disabled', true);
+                
+                // Form verilerini topla
+                var formData = new FormData(this);
+                
+                $.ajax({
+                    url: '@Url.Action("CreateCourse", "Admin")',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.success) {
+                            // Başarılı mesajı göster
+                            $('#alertContainer').html(
+                                '<div class="alert alert-success">' +
+                                '<i class="fas fa-check-circle me-1"></i> ' +
+                                'Kurs başarıyla oluşturuldu. Yönlendiriliyorsunuz...' +
+                                '</div>'
+                            );
+                            
+                            // 2 saniye sonra kurslar sayfasına yönlendir
+                            setTimeout(function() {
+                                window.location.href = '@Url.Action("Courses", "Admin")';
+                            }, 2000);
+                        } else {
+                            // Hata mesajı göster
+                            $('#alertContainer').html(
+                                '<div class="alert alert-danger">' +
+                                '<i class="fas fa-exclamation-circle me-1"></i> ' +
+                                response.message +
+                                '</div>'
+                            );
+                            
+                            // Submit butonunu tekrar aktif et
+                            $('#submitButton').prop('disabled', false);
+                        }
+                    },
+                    error: function () {
+                        // Genel hata mesajı göster
+                        $('#alertContainer').html(
+                            '<div class="alert alert-danger">' +
+                            '<i class="fas fa-exclamation-circle me-1"></i> ' +
+                            'Bir hata oluştu. Lütfen tekrar deneyin.' +
+                            '</div>'
+                        );
+                        
+                        // Submit butonunu tekrar aktif et
+                        $('#submitButton').prop('disabled', false);
+                    }
+                });
+            });
+        });
+    </script>
+} 

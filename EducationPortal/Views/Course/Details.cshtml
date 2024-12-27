@@ -1,0 +1,142 @@
+﻿@model CourseViewModel
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">@Model.Title</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/">Ana Sayfa</a></li>
+        <li class="breadcrumb-item"><a href="/Course">Kurslar</a></li>
+        <li class="breadcrumb-item active">@Model.Title</li>
+    </ol>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-book-reader me-1"></i>
+                            Kurs Detayları
+                        </div>
+                        <div class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>
+                            @Model.CreatedDate.ToString("dd.MM.yyyy")
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5 class="card-title">Kurs Açıklaması</h5>
+                        <p class="card-text">@Model.Description</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="card-title">Eğitmen</h5>
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h6 class="mb-0">@Model.Teacher.FirstName @Model.Teacher.LastName</h6>
+                                <small class="text-muted">Eğitmen</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="card-title">Dersler</h5>
+                        @if (!Model.Lessons.Any())
+                        {
+                            <div class="alert alert-info">
+                                Bu kursa henüz ders eklenmemiş.
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="list-group">
+                                @foreach (var lesson in Model.Lessons.OrderBy(l => l.OrderNumber))
+                                {
+                                    <div class="list-group-item">
+                                        <div class="d-flex w-100 justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">@lesson.Title</h6>
+                                                <p class="mb-1 text-muted">@lesson.Description</p>
+                                            </div>
+                                            @if (!string.IsNullOrEmpty(lesson.VideoUrl))
+                                            {
+                                                <a href="@Url.Action("WatchLesson", "Course", new { id = lesson.LessonId })" 
+                                                   class="btn btn-outline-primary btn-sm">
+                                                    <i class="fas fa-play me-1"></i> İzle
+                                                </a>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    @if (Model.ThumbnailImagePath != null)
+                    {
+                        <img src="@Model.ThumbnailImagePath" class="img-fluid rounded mb-3" alt="@Model.Title">
+                    }
+
+                    <div class="d-flex justify-content-between text-muted mb-3">
+                        <span>
+                            <i class="fas fa-book me-1"></i>
+                            @Model.Lessons.Count Ders
+                        </span>
+                        <span>
+                            <i class="fas fa-users me-1"></i>
+                            @Model.EnrolledStudents.Count Öğrenci
+                        </span>
+                    </div>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        @if (Model.EnrolledStudents.Any(s => s.Id == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value))
+                        {
+                            <div class="alert alert-success mb-0">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Bu kursa kayıtlısınız
+                            </div>
+                        }
+                        else
+                        {
+                            <form asp-action="EnrollCourse" asp-controller="Student" method="post">
+                                <input type="hidden" name="courseId" value="@Model.CourseId" />
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-graduation-cap me-2"></i>
+                                    Kursa Kaydol
+                                </button>
+                            </form>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-0">
+                            Kursa kaydolmak için lütfen <a href="/Account/Login">giriş yapın</a>.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        .accordion-button:not(.collapsed) {
+            background-color: #f8f9fa;
+            color: #0d6efd;
+        }
+        
+        .accordion-button:focus {
+            box-shadow: none;
+            border-color: rgba(0,0,0,.125);
+        }
+    </style>
+}
+

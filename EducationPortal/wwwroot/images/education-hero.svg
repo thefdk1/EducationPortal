@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800px" height="600px" viewBox="0 0 800 600" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <!-- Arka plan daire -->
+        <circle fill="#FFFFFF" opacity="0.1" cx="400" cy="300" r="250"/>
+        
+        <!-- Kitap yığını -->
+        <g transform="translate(250, 200)">
+            <!-- Alt kitap -->
+            <rect fill="#FFFFFF" x="0" y="160" width="300" height="40" rx="5"/>
+            <!-- Orta kitap -->
+            <rect fill="#FFFFFF" opacity="0.9" x="20" y="120" width="300" height="40" rx="5"/>
+            <!-- Üst kitap -->
+            <rect fill="#FFFFFF" opacity="0.8" x="40" y="80" width="300" height="40" rx="5"/>
+        </g>
+        
+        <!-- Mezuniyet şapkası -->
+        <g transform="translate(350, 150)">
+            <path d="M0,0 L100,0 L50,50 Z" fill="#FFFFFF"/>
+            <rect fill="#FFFFFF" x="20" y="-20" width="60" height="20" rx="5"/>
+        </g>
+        
+        <!-- Kalem -->
+        <g transform="translate(200, 250) rotate(-45)">
+            <rect fill="#FFFFFF" opacity="0.9" x="0" y="0" width="200" height="15" rx="5"/>
+            <path d="M200,0 L220,7.5 L200,15 Z" fill="#FFFFFF" opacity="0.9"/>
+        </g>
+        
+        <!-- Dekoratif elementler -->
+        <circle fill="#FFFFFF" opacity="0.2" cx="150" cy="150" r="20"/>
+        <circle fill="#FFFFFF" opacity="0.2" cx="650" cy="450" r="15"/>
+        <circle fill="#FFFFFF" opacity="0.2" cx="200" cy="500" r="10"/>
+        <circle fill="#FFFFFF" opacity="0.2" cx="600" cy="100" r="25"/>
+    </g>
+</svg> 

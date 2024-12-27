@@ -1,0 +1,75 @@
+@model List<Course>
+
+@{
+    ViewData["Title"] = "Kurslarım";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Kurslarım</h1>
+    <a asp-action="CreateCourse" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Yeni Kurs Oluştur
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5">
+        <i class="fas fa-book fa-3x text-muted mb-3"></i>
+        <h4>Henüz Kurs Oluşturmadınız</h4>
+        <p class="text-muted">İlk kursunuzu oluşturmak için "Yeni Kurs Oluştur" butonuna tıklayın.</p>
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var course in Model)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <img src="@course.ThumbnailImagePath" class="card-img-top" alt="@course.Title"
+                         style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">@course.Title</h5>
+                        <p class="card-text text-muted">
+                            @(course.Description?.Length > 100 
+                                ? course.Description.Substring(0, 100) + "..." 
+                                : course.Description)
+                        </p>
+                        
+                        <div class="d-flex justify-content-between text-muted small mb-3">
+                            <span><i class="fas fa-book"></i> @course.Lessons.Count ders</span>
+                            <span><i class="fas fa-users"></i> @course.EnrolledStudents.Count öğrenci</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-top-0 d-flex flex-column gap-2">
+                        <a asp-action="EditCourse" asp-route-id="@course.CourseId" 
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-edit"></i> Düzenle
+                        </a>
+                        <a asp-action="AddLesson" asp-route-courseId="@course.CourseId" 
+                           class="btn btn-outline-success">
+                            <i class="fas fa-plus"></i> Ders Ekle
+                        </a>
+                        <a asp-action="CourseStudents" asp-route-courseId="@course.CourseId" 
+                           class="btn btn-outline-info">
+                            <i class="fas fa-users"></i> Öğrenciler
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@section Scripts {
+    <style>
+        .card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+    </style>
+} 

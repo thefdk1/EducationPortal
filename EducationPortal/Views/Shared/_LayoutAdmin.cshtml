@@ -1,0 +1,171 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>@ViewData["Title"] - Yönetici Paneli</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="~/sbadmin/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="~/sbadmin/css/sb-admin-2.min.css" rel="stylesheet">
+
+    <!-- Toast Notification Styles -->
+    <style>
+        .custom-toast {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease-in-out;
+            max-width: 350px;
+        }
+
+        .custom-toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .custom-toast .toast-header {
+            background: #4e73df;
+            color: white;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            padding: 0.75rem 1rem;
+        }
+
+        .custom-toast .toast-body {
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .custom-toast .btn-close {
+            color: white;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .custom-toast .btn-close:hover {
+            opacity: 1;
+        }
+
+        #notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+    </style>
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <partial name="_SideNav" />
+        <!-- End of Sidebar -->
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+    <!-- Core JavaScript-->
+    <script src="~/sbadmin/vendor/jquery/jquery.min.js"></script>
+    <script src="~/sbadmin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- DataTables JavaScript -->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- SignalR JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+
+    <!-- Custom scripts -->
+    <script src="~/sbadmin/js/sb-admin-2.min.js"></script>
+
+    @section Scripts {
+        <script>
+            // SignalR bağlantısını başlat
+            var connection = new signalR.HubConnectionBuilder()
+                .withUrl("/notificationHub")
+                .build();
+
+            // Bildirim alma fonksiyonu
+            connection.on("ReceiveNotification", function (message) {
+                // Toast bildirimi oluştur
+                var notification = `
+                    <div class="custom-toast" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header">
+                            <i class="fas fa-bell me-2"></i>
+                            <strong class="me-auto">Yeni Bildirim</strong>
+                            <small class="text-white-50">şimdi</small>
+                            <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                    </div>`;
+                
+                // Bildirimi container'a ekle
+                var $notification = $(notification);
+                $("#notification-container").append($notification);
+                
+                // Animasyon için timeout
+                setTimeout(function() {
+                    $notification.addClass('show');
+                }, 100);
+                
+                // 5 saniye sonra bildirimi kaldır
+                setTimeout(function() {
+                    $notification.removeClass('show');
+                    setTimeout(function() {
+                        $notification.remove();
+                    }, 300);
+                }, 5000);
+            });
+
+            // Bağlantıyı başlat
+            connection.start().catch(function (err) {
+                console.error(err.toString());
+            });
+
+            // Toast kapatma butonunu aktifleştir
+            $(document).on('click', '.custom-toast .btn-close', function() {
+                var $toast = $(this).closest('.custom-toast');
+                $toast.removeClass('show');
+                setTimeout(function() {
+                    $toast.remove();
+                }, 300);
+            });
+        </script>
+    }
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

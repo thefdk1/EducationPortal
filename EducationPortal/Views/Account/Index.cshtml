@@ -1,0 +1,31 @@
+﻿@model IEnumerable<EducationPortal.Models.UserAccount>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Accounts</title>
+</head>
+<body>
+    <h1>User Accounts</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>User Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var account in Model)
+            {
+                <tr>
+                    <td>@account.FullName</td>
+                    <td>@account.Email</td>
+                    <td>@account.UserName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>
+

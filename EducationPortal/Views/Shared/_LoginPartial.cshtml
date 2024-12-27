@@ -1,0 +1,26 @@
+﻿@if (Context.User.Identity.Name != null){
+	<form asp-controller="Account" asp-action="LogOut" method="post" id="LogoutForm" class="navbar-right">
+		<ul class="nav navbar-nav navbar-right">
+            <li class="nav-item dropdown">
+                <a class="nav-link d-flex align-items-center bg-light rounded-pill px-4 py-2 shadow-sm"
+                   style="transition: all 0.3s ease;">
+                    <div class="mr-2 rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
+                         style="width: 30px; height: 30px;">
+                        @Context.User.Identity.Name.Substring(0, 1).ToUpper()
+                    </div>
+                    <span class="ml-8 font-weight-bold text-dark">
+                        Merhaba, @Context.User.Identity.Name!
+                    </span>
+                </a>
+            </li>
+			<li><a class="nav-link text-dark" asp-controller="Account" asp-action="LogOut">Çıkış Yap</a></li>
+		</ul>
+
+	</form>
+}
+else {
+	<ul class="nav navbar-nav navbar-right">
+		<li><a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Kaydol</a></li>
+		<li><a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Giriş Yap</a></li>
+	</ul>
+}

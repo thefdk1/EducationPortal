@@ -1,0 +1,123 @@
+@model EducationPortal.ViewModels.CourseViewModel
+
+@{
+    ViewData["Title"] = "Kurs Düzenle";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Kurs Düzenle</h2>
+        <form asp-action="DeleteCourse" asp-route-id="@Model.CourseId" method="post" 
+              onsubmit="return confirm('Bu kursu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.');">
+            <button type="submit" class="btn btn-danger">Kursu Sil</button>
+        </form>
+    </div>
+
+    <form asp-action="EditCourse" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="CourseId" />
+        <input type="hidden" asp-for="TeacherId" />
+        
+        <div class="form-group mb-3">
+            <label asp-for="Title" class="form-label"></label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Description" class="form-label"></label>
+            <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="ThumbnailImagePath" class="form-label"></label>
+            <input type="file" name="thumbnailImage" class="form-control" accept="image/*" onchange="previewImage(event)" />
+            @if (!string.IsNullOrEmpty(Model.ThumbnailImagePath))
+            {
+                <div class="mt-2">
+                    <img src="@Model.ThumbnailImagePath" alt="Kurs Kapak Resmi" class="img-fluid rounded" style="max-width: 200px;" />
+                </div>
+            }
+            <div id="imagePreview" class="mt-2 d-none">
+                <img src="#" alt="Yeni Resim Önizleme" class="img-fluid rounded" style="max-width: 200px;" />
+            </div>
+        </div>
+
+        <div class="form-group mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Değişiklikleri Kaydet
+            </button>
+            <a asp-action="MyCourses" class="btn btn-outline-secondary">
+                <i class="fas fa-times"></i> İptal
+            </a>
+        </div>
+    </form>
+
+    <div class="mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Dersler</h3>
+            <a asp-action="AddLesson" asp-route-courseId="@Model.CourseId" class="btn btn-success">
+                <i class="fas fa-plus"></i> Yeni Ders Ekle
+            </a>
+        </div>
+
+        @if (Model.Lessons != null && Model.Lessons.Any())
+        {
+            <div class="list-group">
+                @foreach (var lesson in Model.Lessons.OrderBy(l => l.OrderNumber))
+                {
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-1">@lesson.OrderNumber. @lesson.Title</h5>
+                                <p class="mb-1">@lesson.Description</p>
+                                @if (!string.IsNullOrEmpty(lesson.VideoUrl))
+                                {
+                                    <small class="text-muted">Video URL: @lesson.VideoUrl</small>
+                                }
+                            </div>
+                            <div class="btn-group">
+                                <a asp-action="EditLesson" asp-route-id="@lesson.LessonId" 
+                                   class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i> Düzenle
+                                </a>
+                                <form asp-action="DeleteLesson" asp-route-id="@lesson.LessonId" method="post" 
+                                      onsubmit="return confirm('Bu dersi silmek istediğinizden emin misiniz?');">
+                                    <button type="submit" class="btn btn-sm btn-danger ms-2">
+                                        <i class="fas fa-trash"></i> Sil
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">Henüz ders eklenmemiş.</p>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        function previewImage(event) {
+            var preview = document.querySelector('#imagePreview img');
+            var previewContainer = document.querySelector('#imagePreview');
+            var file = event.target.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function() {
+                preview.src = reader.result;
+                previewContainer.classList.remove('d-none');
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+} 

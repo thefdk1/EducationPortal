@@ -1,0 +1,111 @@
+﻿@{
+    ViewData["Title"] = "Yönetici Paneli";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Yönetici Paneli</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item active">Kontrol Paneli</li>
+    </ol>
+
+    <div class="row">
+        <div class="col-xl-4 col-md-6">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">Kullanıcı Yönetimi</h4>
+                            <div class="small">Kullanıcıları görüntüle ve yönet</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="/Admin/Users">Detayları Görüntüle</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-book fa-2x"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">Kurs Yönetimi</h4>
+                            <div class="small">Kursları görüntüle ve yönet</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="/Admin/Courses">Detayları Görüntüle</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-md-6">
+            <div class="card bg-info text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-graduation-cap fa-2x"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">Toplam Kurs</h4>
+                            <div class="small" id="totalCourseCount">@ViewBag.CourseCount kurs</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="/Admin/Courses">Detayları Görüntüle</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // SignalR bağlantısını başlat
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl("/notificationHub")
+            .build();
+
+        // Bildirim alma fonksiyonu
+        connection.on("ReceiveNotification", function (message) {
+            // Toast bildirimi göster
+            var notification = `
+                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <strong class="me-auto">Bildirim</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                </div>`;
+            
+            $("#notification-container").append(notification);
+            
+            // 5 saniye sonra bildirimi kaldır
+            setTimeout(function() {
+                $("#notification-container .toast").first().remove();
+            }, 5000);
+
+            // Kurs sayısını güncelle
+            var currentCount = parseInt($("#totalCourseCount").text());
+            $("#totalCourseCount").text((currentCount + 1) + " kurs");
+        });
+
+        // Bağlantıyı başlat
+        connection.start().catch(function (err) {
+            console.error(err.toString());
+        });
+    </script>
+}

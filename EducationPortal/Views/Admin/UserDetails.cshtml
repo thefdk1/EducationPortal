@@ -1,0 +1,105 @@
+@model EducationPortal.Models.UserAccount
+
+@{
+    ViewData["Title"] = "Kullanıcı Detayları";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-user"></i> Kullanıcı Detayları
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="text-center mb-4">
+                    @if (string.IsNullOrEmpty(Model.ProfileImagePath))
+                    {
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3"
+                             style="width: 128px; height: 128px; font-size: 48px;">
+                            @Model.FirstName[0]@Model.LastName[0]
+                        </div>
+                    }
+                    else
+                    {
+                        <img src="@Model.ProfileImagePath" class="rounded-circle mb-3"
+                             alt="@Model.FullName" style="width: 128px; height: 128px; object-fit: cover;">
+                    }
+                    <h4>@Model.FullName</h4>
+                    <p class="text-muted">@Model.Email</p>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h5 class="mb-3">Kullanıcı Bilgileri</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th style="width: 150px;">Kullanıcı Adı</th>
+                            <td>@Model.UserName</td>
+                        </tr>
+                        <tr>
+                            <th>Ad</th>
+                            <td>@Model.FirstName</td>
+                        </tr>
+                        <tr>
+                            <th>Soyad</th>
+                            <td>@Model.LastName</td>
+                        </tr>
+                        <tr>
+                            <th>E-posta</th>
+                            <td>@Model.Email</td>
+                        </tr>
+                        <tr>
+                            <th>Roller</th>
+                            <td>
+                                @if (Model.Roles != null && Model.Roles.Any())
+                                {
+                                    foreach (var role in Model.Roles)
+                                    {
+                                        <span class="badge bg-primary me-1">@role</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Rol atanmamış</span>
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="mt-4">
+                    <h5 class="mb-3">Rol Yönetimi</h5>
+                    <form asp-action="UpdateUserRoles" method="post">
+                        <input type="hidden" name="userId" value="@Model.Id" />
+                        <div class="mb-3">
+                            @foreach (var role in ViewBag.AllRoles)
+                            {
+                                var isChecked = Model.Roles?.Contains(role.Name) ?? false;
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selectedRoles" 
+                                           value="@role.Name" id="role_@role.Name" @(isChecked ? "checked" : "")>
+                                    <label class="form-check-label" for="role_@role.Name">
+                                        @role.Name
+                                        @if (!string.IsNullOrEmpty(role.Description))
+                                        {
+                                            <small class="text-muted">(@role.Description)</small>
+                                        }
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Rolleri Kaydet
+                        </button>
+                        <a asp-action="UserManagement" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Geri Dön
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

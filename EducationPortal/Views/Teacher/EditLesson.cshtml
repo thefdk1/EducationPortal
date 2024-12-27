@@ -1,0 +1,48 @@
+@model EducationPortal.Models.Lesson
+
+@{
+    ViewData["Title"] = "Ders Düzenle";
+}
+
+<div class="container mt-4">
+    <h2>Ders Düzenle</h2>
+    <h4>Kurs: @ViewBag.CourseTitle</h4>
+
+    <form asp-action="EditLesson" method="post">
+        <input type="hidden" asp-for="LessonId" />
+        <input type="hidden" asp-for="CourseId" />
+        
+        <div class="form-group mb-3">
+            <label asp-for="Title" class="control-label">Ders Başlığı</label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Description" class="control-label">Açıklama</label>
+            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="VideoUrl" class="control-label">Video URL</label>
+            <input asp-for="VideoUrl" class="form-control" />
+            <span asp-validation-for="VideoUrl" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="OrderNumber" class="control-label">Sıra Numarası</label>
+            <input asp-for="OrderNumber" class="form-control" type="number" min="1" />
+            <span asp-validation-for="OrderNumber" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mt-4">
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+            <a asp-action="EditCourse" asp-route-id="@Model.CourseId" class="btn btn-secondary">İptal</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

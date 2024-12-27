@@ -1,0 +1,276 @@
+@model EducationPortal.Models.Course
+@using System.Security.Claims
+@{
+    ViewData["Title"] = "Kurs Detayı";
+    Layout = "_Layout";
+    var isEnrolled = Model.EnrolledStudents.Any(s => s.Id == User.FindFirstValue(ClaimTypes.NameIdentifier));
+}
+
+<!-- Video Modal -->
+<div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-white" id="videoModalLabel">Video</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="stopVideo()"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="ratio ratio-16x9">
+                    <iframe id="videoPlayer" src="" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="h3 mb-3">@Model.Title</h1>
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success">
+                            @TempData["SuccessMessage"]
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger">
+                            @TempData["ErrorMessage"]
+                        </div>
+                    }
+
+                    <div class="mb-4">
+                        @if (!string.IsNullOrEmpty(Model.ThumbnailImagePath))
+                        {
+                            <img src="@Model.ThumbnailImagePath" alt="@Model.Title" class="img-fluid rounded mb-3" />
+                        }
+
+                        <p class="text-muted">
+                            <i class="fas fa-user me-1"></i> Eğitmen: @Model.Teacher.FirstName @Model.Teacher.LastName
+                        </p>
+
+                        <p class="text-muted">
+                            <i class="fas fa-book me-1"></i> Ders Sayısı: @Model.Lessons.Count
+                            <span class="mx-2">|</span>
+                            <i class="fas fa-users me-1"></i> Kayıtlı Öğrenci: @Model.EnrolledStudents.Count
+                        </p>
+
+                        <div class="mb-4">
+                            <h5>Kurs Açıklaması</h5>
+                            <p>@Model.Description</p>
+                        </div>
+
+                        @if (!isEnrolled)
+                        {
+                            <form asp-action="EnrollCourse" method="post" class="mb-3">
+                                <input type="hidden" name="courseId" value="@Model.CourseId" />
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-sign-in-alt me-1"></i> Kursa Kaydol
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-1"></i> Bu kursa kayıtlısınız.
+                            </div>
+                        }
+                    </div>
+
+                    @if (Model.Lessons.Any())
+                    {
+                        <div class="mt-4">
+                            <h5>Dersler</h5>
+                        <div class="list-group">
+                            @foreach (var lesson in Model.Lessons.OrderBy(l => l.OrderNumber))
+                            {
+                                    <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between align-items-center">
+                                            <div class="d-flex align-items-center">
+                                                <div class="form-check me-3">
+                                                    <input class="form-check-input" type="checkbox" id="lesson-@lesson.LessonId">
+                                                    <label class="form-check-label" for="lesson-@lesson.LessonId">
+                                                        @lesson.Title
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            @if (isEnrolled)
+                                            {
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge bg-secondary me-2 watched-status" id="status-@lesson.LessonId">
+                                                        İzlenmedi
+                                                    </span>
+                                                    <button class="btn btn-sm btn-outline-primary watch-video" 
+                                                            data-video-url="@lesson.VideoUrl" 
+                                                            data-lesson-title="@lesson.Title"
+                                                            data-lesson-id="@lesson.LessonId">
+                                                        <i class="fas fa-play me-1"></i> Dersi İzle
+                                                    </button>
+                                                </div>
+                                            }
+                                        </div>
+                                        <p class="mb-1 small text-muted ms-4">@lesson.Description</p>
+                                </div>
+                            }
+                        </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Kurs Bilgileri</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-calendar me-1"></i>
+                            Oluşturulma: @Model.CreatedDate.ToString("dd.MM.yyyy")
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-book me-1"></i>
+                            Toplam Ders: @Model.Lessons.Count
+                        </li>
+                        <li>
+                            <i class="fas fa-users me-1"></i>
+                            Kayıtlı Öğrenci: @Model.EnrolledStudents.Count
+                        </li>
+                    </ul>
+
+                    @if (!isEnrolled)
+                    {
+                        <form asp-action="EnrollCourse" method="post">
+                                <input type="hidden" name="courseId" value="@Model.CourseId" />
+                                <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-sign-in-alt me-1"></i> Kursa Kaydol
+                                </button>
+                            </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success mb-0">
+                            <i class="fas fa-check-circle me-1"></i> Bu kursa kayıtlısınız.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
+
+@section Styles {
+    <style>
+        .modal-backdrop.show {
+            backdrop-filter: blur(5px);
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .watch-video {
+            min-width: 100px;
+        }
+
+        .modal-header .btn-close {
+            background-color: white;
+        }
+
+        #videoModal .modal-content {
+            background-color: transparent;
+        }
+
+        #videoModal .modal-header {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 0.3rem 0.3rem 0 0;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // İzlenen dersleri localStorage'da saklayacağız
+        function markAsWatched(lessonId) {
+            // LocalStorage'dan izlenen dersleri al
+            let watchedLessons = JSON.parse(localStorage.getItem('watchedLessons')) || [];
+            
+            // Eğer ders daha önce izlenmediyse ekle
+            if (!watchedLessons.includes(lessonId)) {
+                watchedLessons.push(lessonId);
+                localStorage.setItem('watchedLessons', JSON.stringify(watchedLessons));
+            }
+            
+            // Checkbox'ı işaretle
+            document.getElementById(`lesson-${lessonId}`).checked = true;
+            
+            // Durumu güncelle
+            updateLessonStatus(lessonId);
+        }
+
+        function updateLessonStatus(lessonId) {
+            const statusBadge = document.getElementById(`status-${lessonId}`);
+            statusBadge.textContent = 'İzlendi';
+            statusBadge.classList.remove('bg-secondary');
+            statusBadge.classList.add('bg-success');
+        }
+
+        // Sayfa yüklendiğinde izlenen dersleri işaretle
+        document.addEventListener('DOMContentLoaded', function() {
+            const watchedLessons = JSON.parse(localStorage.getItem('watchedLessons')) || [];
+            
+            watchedLessons.forEach(lessonId => {
+                const checkbox = document.getElementById(`lesson-${lessonId}`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    updateLessonStatus(lessonId);
+                }
+            });
+        });
+
+        $(document).ready(function() {
+            $('.watch-video').click(function() {
+                var videoUrl = $(this).data('video-url');
+                var lessonTitle = $(this).data('lesson-title');
+                var lessonId = $(this).data('lesson-id');
+                
+                // YouTube video ID'sini al
+                var videoId = getYouTubeVideoId(videoUrl);
+                
+                if (videoId) {
+                    // Modal başlığını güncelle
+                    $('#videoModalLabel').text(lessonTitle);
+                    
+                    // Video iframe'ini güncelle
+                    $('#videoPlayer').attr('src', `https://www.youtube.com/embed/${videoId}?autoplay=1`);
+                    
+                    // Dersi izlendi olarak işaretle
+                    markAsWatched(lessonId);
+                    
+                    // Modal'ı göster
+                    $('#videoModal').modal('show');
+                } else {
+                    alert('Geçerli bir video URL\'si bulunamadı.');
+                }
+            });
+        });
+
+        // Modal kapandığında videoyu durdur
+        function stopVideo() {
+            $('#videoPlayer').attr('src', '');
+        }
+
+        $('#videoModal').on('hidden.bs.modal', function () {
+            stopVideo();
+        });
+
+        // YouTube URL'sinden video ID'sini çıkaran fonksiyon
+        function getYouTubeVideoId(url) {
+            var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            var match = url.match(regExp);
+            return (match && match[2].length == 11) ? match[2] : null;
+        }
+    </script>
+} 
